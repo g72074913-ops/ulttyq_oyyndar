@@ -1708,7 +1708,7 @@ linkSent:"Ссылка для входа отправлена на почту. �
 add1:"+ Добавить событие",add2:"+ Добавить публикацию",all:"Все",up:"Предстоящие",on:"Идут сейчас",past:"Прошедшие",
 ts:{up:"Предстоит",on:"Идёт сейчас",past:"Завершено"},anyGame:"Любая игра",city:"Город",empty:"Пока ничего нет.",loading:"Загрузка…",
 err:"Не удалось загрузить данные. Проверьте интернет.",fail:"Не удалось выполнить действие. Проверьте данные и попробуйте позже.",
-fLang:"Язык вашего текста",fTitle:"Заголовок",fDesc:"Описание",fBody:"Текст",fGame:"Игра (необязательно)",fStart:"Дата начала",
+fLang:"Язык вашего текста",fTitle:"Заголовок",fDesc:"Описание",fBody:"Текст",fGame:"Игра *",needGame:"Выберите хотя бы одну игру.",fStart:"Дата начала",
 fEnd:"Дата окончания (необязательно)",fCity:"Город",fVenue:"Место проведения",fOrg:"Организатор",
 fContact:"Публичный контакт (необязательно; будет виден всем)",fLink:"Ссылка (необязательно)",fPhoto:"Фото (необязательно)",
 fPhotoHint:"Можно только текст. Не загружайте фото детей.",fName:"Как подписать (необязательно)",
@@ -1727,7 +1727,7 @@ linkSent:"Кіру сілтемесі поштаңызға жіберілді. �
 add1:"+ Іс-шара қосу",add2:"+ Жарияланым қосу",all:"Барлығы",up:"Алдағы",on:"Қазір өтуде",past:"Өткен",
 ts:{up:"Алда",on:"Қазір өтуде",past:"Аяқталды"},anyGame:"Кез келген ойын",city:"Қала",empty:"Әзірге ештеңе жоқ.",loading:"Жүктелуде…",
 err:"Деректерді жүктеу мүмкін болмады. Интернетті тексеріңіз.",fail:"Әрекет орындалмады. Деректерді тексеріп, кейінірек қайталаңыз.",
-fLang:"Мәтініңіздің тілі",fTitle:"Тақырып",fDesc:"Сипаттама",fBody:"Мәтін",fGame:"Ойын (міндетті емес)",fStart:"Басталу күні",
+fLang:"Мәтініңіздің тілі",fTitle:"Тақырып",fDesc:"Сипаттама",fBody:"Мәтін",fGame:"Ойын *",needGame:"Кемінде бір ойынды таңдаңыз.",fStart:"Басталу күні",
 fEnd:"Аяқталу күні (міндетті емес)",fCity:"Қала",fVenue:"Өтетін орны",fOrg:"Ұйымдастырушы",
 fContact:"Ашық байланыс (міндетті емес; барлығына көрінеді)",fLink:"Сілтеме (міндетті емес)",fPhoto:"Фото (міндетті емес)",
 fPhotoHint:"Тек мәтін де болады. Балалардың фотосын жүктемеңіз.",fName:"Қол қою (міндетті емес)",
@@ -1746,7 +1746,7 @@ linkSent:"A sign-in link was sent to your email. Open the email on this device a
 add1:"+ Add event",add2:"+ Add publication",all:"All",up:"Upcoming",on:"Happening now",past:"Past",
 ts:{up:"Upcoming",on:"Happening now",past:"Finished"},anyGame:"Any game",city:"City",empty:"Nothing here yet.",loading:"Loading…",
 err:"Could not load data. Check your internet.",fail:"Action failed. Check the data and try again later.",
-fLang:"Language of your text",fTitle:"Title",fDesc:"Description",fBody:"Text",fGame:"Game (optional)",fStart:"Start date",
+fLang:"Language of your text",fTitle:"Title",fDesc:"Description",fBody:"Text",fGame:"Game *",needGame:"Select at least one game.",fStart:"Start date",
 fEnd:"End date (optional)",fCity:"City",fVenue:"Venue",fOrg:"Organizer",fContact:"Public contact (optional; visible to everyone)",
 fLink:"Link (optional)",fPhoto:"Photo (optional)",fPhotoHint:"Text only is fine. Do not upload photos of children.",
 fName:"Byline (optional)",fNameHint:"Name, nickname or organization. If empty, the material is shown without a name.",
@@ -1871,13 +1871,13 @@ const mineHtml=t=>S.sess&&S.mine[t].length?`<h3 class="cm-h">${C().mine}</h3><di
 function listHtml(arr,t){if(S.loading)return`<p class="cm-empty">${C().loading}</p>`;if(S.err)return`<p class="cm-empty">${C().err}</p>`;
  return arr.length?`<div class="cm-list">${arr.map(i=>card(i,t,"pub")).join("")}</div>`:`<p class="cm-empty">${C().empty}</p>`;}
 function evHtml(){const c=C();let h=bar("events")+modHtml("events")+mineHtml("events");
- h+=`<div class="cm-filters"><div class="cm-chips">${chips("tf",["all","up","on","past"],k=>c[k])}</div>${gsel("gf")}<input data-f="city" placeholder="${c.city}" value="${esc(S.city)}"></div>`;
+ h+=`<div class="cm-filters"><div class="cm-chips">${chips("tf",["all","up","on","past"],k=>c[k])}</div><input data-f="city" placeholder="${c.city}" value="${esc(S.city)}"></div>`;
  const o={on:0,up:1,past:2};
  const l=S.ev.filter(e=>(S.tf=="all"||stOf(e)==S.tf)&&(!S.gf||(e.game||"").split(",").includes(S.gf))&&(!S.city||(e.city||"").toLowerCase().includes(S.city.toLowerCase())))
   .sort((a,b)=>{const x=stOf(a),y=stOf(b);if(x!=y)return o[x]-o[y];return x=="past"?b.start_date.localeCompare(a.start_date):a.start_date.localeCompare(b.start_date)});
  return h+listHtml(l,"events");}
 function pubHtml(){const c=C();let h=bar("publications")+modHtml("publications")+mineHtml("publications");
- h+=`<div class="cm-filters"><div class="cm-chips">${chips("kf",["all","history","experience","method","other"],k=>k=="all"?c.all:c.kinds[k])}</div>${gsel("pgf")}</div>`;
+ h+=`<div class="cm-filters"><div class="cm-chips">${chips("kf",["all","history","experience","method","other"],k=>k=="all"?c.all:c.kinds[k])}</div></div>`;
  return h+listHtml(S.pubs.filter(p=>(S.kf=="all"||p.kind==S.kf)&&(!S.pgf||(p.game||"").split(",").includes(S.pgf))),"publications");}
 function collect(){QA("#view-events [name],#view-pubs [name],#cm-modal [name]").forEach(el=>{if(el.type=="file")return;
  if(el.name=="lem"&&!el.value)return;S.fv[el.name]=el.type=="checkbox"?el.checked:el.value;});}
@@ -1902,6 +1902,7 @@ async function share(t,id){const it=(t=="events"?S.ev:S.pubs).find(x=>x.id==id);
 function say(m){S.msg=m;draw();if(!S.form){const t=Q("#tab-switch");if(t)t.scrollIntoView({behavior:"smooth"});}}
 async function submit(t){collect();const v=S.fv,c=C(),ev=t=="events";
  if(!v.consent||!(v.title||"").trim()||!(v.desc||"").trim()||(ev&&(!v.start||!v.end))){say(c.needFill);return}
+ if(!GAMES.some(g=>v["g_"+g.id])){say(c.needGame);return}
  if(v.title.trim().length<3||v.desc.trim().length<(ev?10:20)){say(MINLEN[currentLang]);return}
  if(ev&&v.end&&v.end<v.start){say(c.dateErr);return}
  try{const fl=Q("#ff input[type=file]");let path=null;if(fl&&fl.files[0])path=await upImg(fl.files[0]);
