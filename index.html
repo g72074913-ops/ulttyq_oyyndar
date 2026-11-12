@@ -532,6 +532,8 @@
   .cm-sheet input:not([type=checkbox]),.cm-sheet select,.cm-sheet textarea{width:100%;min-height:46px;font:500 1rem 'Manrope',sans-serif;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);}
   .cm-sheet textarea{min-height:130px;resize:vertical;}
   .cm-sheet .chk input{width:22px;height:22px;flex:none;margin-top:2px;}
+  .cm-sheet .gm-set{border:0;padding:0;margin:0;display:grid;gap:10px;min-width:0;}
+  .cm-sheet .gm-set legend{padding:0;margin-bottom:8px;font-size:.82rem;font-weight:700;color:var(--ink-soft);}
   .cm-sheet-h{position:sticky;top:0;z-index:2;background:var(--paper);display:flex;justify-content:space-between;align-items:center;padding:16px 0 10px;font-family:'Fraunces',serif;font-weight:600;font-size:1.2rem;border-bottom:1px solid var(--line);}
   .cm-x{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--sand);font-size:1.4rem;line-height:1;cursor:pointer;color:var(--ink-soft);}
   .cm-foot{position:sticky;bottom:0;z-index:2;background:var(--paper);display:flex;gap:10px;flex-wrap:wrap;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);}
@@ -1729,7 +1731,7 @@ fLang:"Мәтініңіздің тілі",fTitle:"Тақырып",fDesc:"Сип�
 fEnd:"Аяқталу күні (міндетті емес)",fCity:"Қала",fVenue:"Өтетін орны",fOrg:"Ұйымдастырушы",
 fContact:"Ашық байланыс (міндетті емес; барлығына көрінеді)",fLink:"Сілтеме (міндетті емес)",fPhoto:"Фото (міндетті емес)",
 fPhotoHint:"Тек мәтін де болады. Балалардың фотосын жүктемеңіз.",fName:"Қол қою (міндетті емес)",
-fNameHint:"Аты-жөні, бүркеншік есім немесе ұйым. Бос болса, материал қолсыз шығады.",fSource:"Дереккөз (міндетті емес)",fKind:"Түрі",
+fNameHint:"Аты-жөні, бүркеншік есім немесе ұйым. Бос болса, материал анонимді түрде шығарылады.",fSource:"Дереккөз (міндетті емес)",fKind:"Түрі",
 kinds:{history:"Ойын тарихы",experience:"Жеке тәжірибе",method:"Әдістеме",other:"Басқа"},
 consent:"Бұл материалды жариялауға құқығым бар, онда басқа адамдардың келісімінсіз жеке деректері жоқ.",
 submit:"Тексеруге жіберу",cancel:"Бас тарту",sent:"Тексеруге жіберілді. Модератор мақұлдағаннан кейін материал сайтта пайда болады.",
@@ -1818,7 +1820,7 @@ function view(it){const L=currentLang,tr=(it.translations||{})[L],body=it.descri
 function card(it,t,mode){const c=C(),ev=t=="events",v=view(it),m=[];
  if(ev){  const pl=[it.city,it.venue].filter(Boolean).join(", ");if(pl)m.push(pl);if(it.organizer)m.push(it.organizer);}
  else m.push(c.kinds[it.kind]||"");
- if(it.game)m.push(gn(it.game));
+ if(it.game)it.game.split(",").forEach(x=>m.push(gn(x)));
  let h=`<article class="pcard">`;
  if(mode=="mine")h+=`<div class="cm-tags"><span class="badge ${it.status}">${c.st[it.status]}</span>${ev?cdBadge(it):""}</div>`;
  else if(ev&&mode=="pub"){const s=stOf(it);h+=`<div class="cm-tags"><span class="badge ${s}">${c.ts[s]}</span>${cdBadge(it)}</div>`;}
@@ -1857,11 +1859,11 @@ function formHtml(t){const c=C(),ev=t=="events",f=n=>esc(S.fv[n]||"");
  if(!ev)h+=`<label>${c.fKind}<select name="kind">${Object.keys(c.kinds).map(k=>`<option value="${k}"${S.fv.kind==k?" selected":""}>${c.kinds[k]}</option>`).join("")}</select></label>`;
  h+=fi("title",c.fTitle,"text",1,200);
  h+=`<label>${(ev?c.fDesc:c.fBody)} *<textarea name="desc" rows="7" maxlength="${ev?5000:20000}">${f("desc")}</textarea></label>`;
- h+=`<label>${c.fGame}<select name="game">${gopt}</select></label>`;
+ h+=`<fieldset class="gm-set"><legend>${c.fGame}</legend>${GAMES.map(g=>`<label class="chk"><input type="checkbox" name="g_${g.id}"${S.fv["g_"+g.id]?" checked":""}> <span>${esc(g[currentLang].title)}</span></label>`).join("")}</fieldset>`;
  if(ev)h+=fi("start",c.fStart,"date",1)+fi("end",XT().fEnd,"date",1)+`<span class="hint">${XT().endHint}</span>`+fi("city",c.fCity,"text",0,120)+fi("venue",c.fVenue)+fi("org",c.fOrg)+fi("contact",c.fContact)+fi("link",c.fLink,"url",0,500);
  else h+=fi("source",c.fSource,"text",0,500);
  h+=`<label>${c.fPhoto}<input type="file" name="photo" accept="image/jpeg,image/png,image/webp"><span class="hint">${c.fPhotoHint}</span></label>`;
- h+=fi("name",c.fName,"text",0,80)+`<span class="hint">${c.fNameHint}</span>`;
+ h+=`<input name="name" type="text" maxlength="80" aria-label="${esc(c.fName)}" value="${f("name")}"><span class="hint">${c.fNameHint}</span>`;
  h+=`<label class="chk"><input type="checkbox" name="consent"${S.fv.consent?" checked":""}> <span>${c.consent}</span></label><span class="hint">${c.priv}</span>`;
  return h+`<div class="cm-foot"><button class="cm-btn" data-a="submit" data-t="${t}">${c.submit}</button><button class="cm-btn alt" data-a="cancel">${c.cancel}</button></div></div></div>`;}
 const modHtml=t=>S.admin&&S.pend[t].length?`<h3 class="cm-h">${C().mod} (${S.pend[t].length})</h3><div class="cm-list">${S.pend[t].map(i=>card(i,t,"mod")).join("")}</div>`:"";
@@ -1871,12 +1873,12 @@ function listHtml(arr,t){if(S.loading)return`<p class="cm-empty">${C().loading}<
 function evHtml(){const c=C();let h=bar("events")+modHtml("events")+mineHtml("events");
  h+=`<div class="cm-filters"><div class="cm-chips">${chips("tf",["all","up","on","past"],k=>c[k])}</div>${gsel("gf")}<input data-f="city" placeholder="${c.city}" value="${esc(S.city)}"></div>`;
  const o={on:0,up:1,past:2};
- const l=S.ev.filter(e=>(S.tf=="all"||stOf(e)==S.tf)&&(!S.gf||e.game==S.gf)&&(!S.city||(e.city||"").toLowerCase().includes(S.city.toLowerCase())))
+ const l=S.ev.filter(e=>(S.tf=="all"||stOf(e)==S.tf)&&(!S.gf||(e.game||"").split(",").includes(S.gf))&&(!S.city||(e.city||"").toLowerCase().includes(S.city.toLowerCase())))
   .sort((a,b)=>{const x=stOf(a),y=stOf(b);if(x!=y)return o[x]-o[y];return x=="past"?b.start_date.localeCompare(a.start_date):a.start_date.localeCompare(b.start_date)});
  return h+listHtml(l,"events");}
 function pubHtml(){const c=C();let h=bar("publications")+modHtml("publications")+mineHtml("publications");
  h+=`<div class="cm-filters"><div class="cm-chips">${chips("kf",["all","history","experience","method","other"],k=>k=="all"?c.all:c.kinds[k])}</div>${gsel("pgf")}</div>`;
- return h+listHtml(S.pubs.filter(p=>(S.kf=="all"||p.kind==S.kf)&&(!S.pgf||p.game==S.pgf)),"publications");}
+ return h+listHtml(S.pubs.filter(p=>(S.kf=="all"||p.kind==S.kf)&&(!S.pgf||(p.game||"").split(",").includes(S.pgf))),"publications");}
 function collect(){QA("#view-events [name],#view-pubs [name],#cm-modal [name]").forEach(el=>{if(el.type=="file")return;
  if(el.name=="lem"&&!el.value)return;S.fv[el.name]=el.type=="checkbox"?el.checked:el.value;});}
 function draw(){if(!Q("#view-events"))return;if(S.form||S.tr||S.loginOpen)collect();
@@ -1903,7 +1905,7 @@ async function submit(t){collect();const v=S.fv,c=C(),ev=t=="events";
  if(v.title.trim().length<3||v.desc.trim().length<(ev?10:20)){say(MINLEN[currentLang]);return}
  if(ev&&v.end&&v.end<v.start){say(c.dateErr);return}
  try{const fl=Q("#ff input[type=file]");let path=null;if(fl&&fl.files[0])path=await upImg(fl.files[0]);
-  const o={lang:v.lang||currentLang,title:v.title.trim(),game:v.game||null,author_display:(v.name||"").trim()||null,consent:true};
+  const o={lang:v.lang||currentLang,title:v.title.trim(),game:GAMES.filter(g=>v["g_"+g.id]).map(g=>g.id).join(",")||null,author_display:(v.name||"").trim()||null,consent:true};
   if(ev)Object.assign(o,{description:v.desc.trim(),start_date:v.start,end_date:v.end||null,city:(v.city||"").trim()||null,venue:(v.venue||"").trim()||null,organizer:(v.org||"").trim()||null,contact:(v.contact||"").trim()||null,link:safe(v.link)||null});
   else Object.assign(o,{kind:v.kind||"history",body:v.desc.trim(),source:(v.source||"").trim()||null});
   if(path)o.image_path=path;
