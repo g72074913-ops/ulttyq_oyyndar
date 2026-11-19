@@ -741,6 +741,13 @@
   .mc.done{background:rgba(20,184,166,.22); color:var(--ink); border-color:#14b8a6; cursor:default;}
   @media (max-width:560px){.mem-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
   @media (max-width:420px){.pl-tile{font-size:1.1rem; border-radius:10px;} .pl-cards{gap:6px;} .mc{min-height:84px;}}
+
+  /* --- вкладки: подстраиваются под ширину текста, при нехватке места переносятся на 2-й ряд (без наезда друг на друга) --- */
+  @media (min-width:561px){
+    .tab-switch{max-width:min(900px,100%); flex-wrap:wrap; justify-content:center; overflow:visible; gap:6px;}
+    .tab-btn{flex:1 1 auto; min-width:max-content; white-space:nowrap; overflow:visible; font-size:.92rem; padding:12px 18px; text-align:center;}
+    .tab-btn .full{display:inline;} .tab-btn .short{display:none;}
+  }
 </style>
 </head>
 <body data-tab="games">

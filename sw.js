@@ -1,4 +1,4 @@
-const CACHE_NAME = "kz-games-v3";
+const CACHE_NAME = "kz-games-v4";
 const ASSETS = ["./", "./index.html"];
 
 self.addEventListener("install", (event) => {
